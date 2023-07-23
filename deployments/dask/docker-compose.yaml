@@ -1,0 +1,31 @@
+version: "3.1"
+
+services:
+  dask-scheduler:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: dask-custom:latest
+    container_name: dask-scheduler
+    hostname: dask-scheduler
+    restart: always
+    expose:
+      - 8786
+      - 8787
+    ports:
+      - 8786:8786
+      - 8787:8787
+    command: 
+      - scheduler
+
+  dask-worker:
+    image: dask-custom:latest
+    container_name: dask-worker
+    restart: always
+    deploy:
+      replicas: 1
+    depends_on:
+      - dask-scheduler
+    command:
+      - worker
+      - tcp://dask-scheduler:8786
